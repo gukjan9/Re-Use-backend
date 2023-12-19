@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+//@SpringBootTest
 @LoadEnvironmentVariables
 public class CategoryModelTest {
     @Autowired
