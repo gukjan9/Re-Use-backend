@@ -1,8 +1,10 @@
 name: Deploy to Test Server
 on:
   push:
-    tags:
-      - 'test/*'
+    branches:
+      - main
+#    tags:
+#      - 'test/*'
 jobs:
   deploy:
     runs-on: ubuntu-latest
