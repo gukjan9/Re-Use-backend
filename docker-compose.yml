@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  database:
+    image: mysql/mysql-reuse:1.0.0
+    container_name: mysql-reuse
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE_URL}
+      MYSQL_USER: ${MYSQL_DATABASE_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_DATABASE_PASSWORD}
+    ports:
+      - 3306:3306
+    networks:
+      - network-reuse
+    restart: always
+
+  spring-reuse:
+    build: .
+    expose:
+      - 8080
+    depends_on:
+      - database
+
+networks:
+  network-reuse:
+    driver: bridge
