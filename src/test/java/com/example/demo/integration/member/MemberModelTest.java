@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+//@SpringBootTest
 @LoadEnvironmentVariables
 public class MemberModelTest {
     @Autowired

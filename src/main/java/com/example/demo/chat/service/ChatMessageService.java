@@ -24,6 +24,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.net.URL;
@@ -118,7 +119,57 @@ public class ChatMessageService {
             redisChatMessageCount = 0L;
         }
 
-        // redis 에 데이터가 있을 때
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+//        // redis 에 데이터가 있을 때
+//        if(redisChatMessageCount != 0){
+//            // redis 데이터랑 mysql 데이터랑 같을 때 + redis 데이터만 100개 이상일 때는 redis 만
+//            if(redisChatMessageCount == mysqlChatMessageCount || redisChatMessageCount >= 100){
+//                List<ChatMessage> chatMessageList = redisMessageTemplate.opsForList().range("chatMessages::" + roomId, 0, 99);
+//                List<ChatMessageResponseDto> chatMessageResponseDtoList = new ArrayList<>();
+//                for (ChatMessage chatMessage : chatMessageList) {
+//                    chatMessageResponseDtoList.add(new ChatMessageResponseDto(chatMessage));
+//                }
+//
+//                stopWatch.stop();
+//                System.out.println("Case 1 (stream) : "+ stopWatch.getTotalTimeMillis() + "ms");
+//
+//                return chatMessageResponseDtoList;
+//            }
+//            // redis 데이터랑 mysql 데이터랑 다를 때
+//            else{
+//                List<ChatMessageResponseDto> chatMessageResponseDtoList = chatMessageRepository.findAllByRoomId(roomId)
+//                        .stream()
+//                        .limit(100 - redisChatMessageCount)
+//                        .map(ChatMessageResponseDto::new)
+//                        .collect(Collectors.toList());
+//
+//                List<ChatMessage> chatMessageList = redisMessageTemplate.opsForList().range("chatMessages::" + roomId, 0, redisChatMessageCount);
+//                for (ChatMessage chatMessage : chatMessageList) {
+//                    chatMessageResponseDtoList.add(new ChatMessageResponseDto(chatMessage));
+//                }
+//
+//                stopWatch.stop();
+//                System.out.println("Case 2 (stream) : "+ stopWatch.getTotalTimeMillis() + "ms");
+//
+//                return chatMessageResponseDtoList;
+//            }
+//        }
+//        // redis 에 데이터가 아예 없을 때
+//        else{
+//            List<ChatMessageResponseDto> chatMessageResponseDtoList = chatMessageRepository.findAllByRoomId(roomId)
+//                    .stream()
+//                    .map(ChatMessageResponseDto::new)
+//                    .toList();
+//
+//            stopWatch.stop();
+//            System.out.println("Case 3 (stream) : "+ stopWatch.getTotalTimeMillis() + "ms");
+//
+//            return chatMessageResponseDtoList;
+//        }
+
+        // redis에 데이터가 있을 때
         if(redisChatMessageCount != 0){
             // redis 데이터랑 mysql 데이터랑 같을 때 + redis 데이터만 100개 이상일 때는 redis 만
             if(redisChatMessageCount == mysqlChatMessageCount || redisChatMessageCount >= 100){
@@ -127,29 +178,43 @@ public class ChatMessageService {
                 for (ChatMessage chatMessage : chatMessageList) {
                     chatMessageResponseDtoList.add(new ChatMessageResponseDto(chatMessage));
                 }
+
+                stopWatch.stop();
+                System.out.println("Case 1 (for) : "+ stopWatch.getTotalTimeMillis() + "ms");
+
                 return chatMessageResponseDtoList;
             }
             // redis 데이터랑 mysql 데이터랑 다를 때
             else{
-                List<ChatMessageResponseDto> chatMessageResponseDtoList = chatMessageRepository.findAllByRoomId(roomId)
-                        .stream()
-                        .limit(100 - redisChatMessageCount)
-                        .map(ChatMessageResponseDto::new)
-                        .collect(Collectors.toList());
+                List<ChatMessage> mysqlChatMessages = chatMessageRepository.findAllByRoomId(roomId);
+                List<ChatMessageResponseDto> chatMessageResponseDtoList = new ArrayList<>();
+                int count = 0;
+                for (ChatMessage chatMessage : mysqlChatMessages) {
+                    if (count++ >= 100 - redisChatMessageCount) break;
+                    chatMessageResponseDtoList.add(new ChatMessageResponseDto(chatMessage));
+                }
 
                 List<ChatMessage> chatMessageList = redisMessageTemplate.opsForList().range("chatMessages::" + roomId, 0, redisChatMessageCount);
                 for (ChatMessage chatMessage : chatMessageList) {
                     chatMessageResponseDtoList.add(new ChatMessageResponseDto(chatMessage));
                 }
+
+                stopWatch.stop();
+                System.out.println("Case 2 (for) : "+ stopWatch.getTotalTimeMillis() + "ms");
+
                 return chatMessageResponseDtoList;
             }
         }
-        // redis 에 데이터가 아예 없을 때
+        // redis에 데이터가 아예 없을 때
         else{
-            List<ChatMessageResponseDto> chatMessageResponseDtoList = chatMessageRepository.findAllByRoomId(roomId)
-                    .stream()
-                    .map(ChatMessageResponseDto::new)
-                    .toList();
+            List<ChatMessage> mysqlChatMessages = chatMessageRepository.findAllByRoomId(roomId);
+            List<ChatMessageResponseDto> chatMessageResponseDtoList = new ArrayList<>();
+            for (ChatMessage chatMessage : mysqlChatMessages) {
+                chatMessageResponseDtoList.add(new ChatMessageResponseDto(chatMessage));
+            }
+
+            stopWatch.stop();
+            System.out.println("Case 3 (for) : "+ stopWatch.getTotalTimeMillis() + "ms");
 
             return chatMessageResponseDtoList;
         }

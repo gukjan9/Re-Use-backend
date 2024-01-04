@@ -43,3 +43,5 @@ src/main/resources/application-local.properties
 /src/main/resources/application-local.yml
 /script/set_env.sh
 /script/set_prod_env.sh
+
+.env
