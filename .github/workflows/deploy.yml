@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - main
-#    tags:
-#      - 'test/*'
+    tags:
+      - '#*'
 jobs:
   deploy:
     runs-on: ubuntu-latest
