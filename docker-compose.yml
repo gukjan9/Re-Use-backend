@@ -4,12 +4,12 @@ services:
   database:
     image: gukjang/mysql-reuse:1.0.0
     container_name: mysql-reuse
-    env_file:
-      - .env
+#    env_file:
+#      - .env
     environment:
-      MYSQL_DATABASE: jdbc:mysql://localhost:3306/jobcat?useSSL=false
-      MYSQL_USER: "root"
-      MYSQL_PASSWORD: "1234"
+      MYSQL_DATABASE: jobcat
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 1234
     ports:
       - 3306:3306
     networks:
