@@ -13,33 +13,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      # JDK 세팅
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
+      # CD
+      # 배포를 위한 prod properties 설정
+      - name: Make application-prod.properties
+        run: |
+          cd ./src/main/resources
+          touch ./application-prod.properties
+          echo "${{ secrets.PROPERTIES_PROD }}" > ./application-prod.properties
+        shell: bash
+
+      # 프로젝트 빌드
       - name: Build Project With Gradle
         run: |
           chmod +x ./gradlew
           ./gradlew clean bootJar
-
-      - name: Deploy Jar
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.SSH_IP_ADDRESS }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: build/libs/demo-0.0.1-SNAPSHOT.jar
-          target: script
-
-      - name: Run New Program
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_IP_ADDRESS }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            source script/kill_old_process.sh
-            source script/set_env.sh
-            source script/run_new_process.sh
+          
+#      - name: Deploy Jar
+#        uses: appleboy/scp-action@v0.1.4
+#        with:
+#          host: ${{ secrets.SSH_IP_ADDRESS }}
+#          username: ${{ secrets.SSH_USERNAME }}
+#          key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          source: build/libs/demo-0.0.1-SNAPSHOT.jar
+#          target: jar
+#
+#      - name: Run New Program
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.SSH_IP_ADDRESS }}
+#          username: ${{ secrets.SSH_USERNAME }}
+#          key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          script: |
+#            source script/kill_old_process.sh
+#            source script/set_env.sh
+#            source script/run_new_process.sh
