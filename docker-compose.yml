@@ -2,7 +2,7 @@ version: "3"
 
 services:
   database:
-    image: mysql/mysql-reuse:1.0.0
+    image: gukjang/mysql-reuse:1.0.0
     container_name: mysql-reuse
     env_file:
       - .env
@@ -16,7 +16,7 @@ services:
       - network-reuse
     restart: always
 
-  spring-reuse:
+  spring:
     build: .
     expose:
       - 8080
