@@ -50,8 +50,8 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            source script/set_env.sh
-            source script/run_new_process.sh
+            source scripts/set_env.sh
+            source scripts/run_new_process.sh
 
 #      - name: Deploy Jar
 #        uses: appleboy/scp-action@v0.1.4
