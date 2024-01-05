@@ -42,21 +42,17 @@ jobs:
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/spring-reuse .
           docker push ${{ secrets.DOCKER_REPO }}/spring-reuse
 
-      #docker-compose 파일을 ec2 서버에 배포
-      - name: Deploy to Prod
+      # 프로젝트 실행
+      - name: Run New Project
         uses: appleboy/ssh-action@master
-        id: deploy-prod
         with:
           host: ${{ secrets.SSH_IP_ADDRESS }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: GITHUB_SHA
           script: |
-            docker stop spring-reuse
-            docker rm spring-reuse
-            sudo docker pull ${{ secrets.DOCKER_REPO }}/spring-reuse
-            docker run -d --name spring-reuse -p 8080:8080 ${{ secrets.DOCKER_REPO }}/spring-reuse
-            docker rmi -f $(docker images -f "dangling=true" -q)
+#            source script/kill_old_process.sh
+            source script/set_env.sh
+            source script/run_new_process.sh
 
 #      - name: Deploy Jar
 #        uses: appleboy/scp-action@v0.1.4
@@ -66,14 +62,3 @@ jobs:
 #          key: ${{ secrets.SSH_PRIVATE_KEY }}
 #          source: build/libs/demo-0.0.1-SNAPSHOT.jar
 #          target: jar
-#
-#      - name: Run New Program
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.SSH_IP_ADDRESS }}
-#          username: ${{ secrets.SSH_USERNAME }}
-#          key: ${{ secrets.SSH_PRIVATE_KEY }}
-#          script: |
-#            source script/kill_old_process.sh
-#            source script/set_env.sh
-#            source script/run_new_process.sh
