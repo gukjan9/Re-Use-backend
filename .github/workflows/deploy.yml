@@ -48,6 +48,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_IP_ADDRESS }}
           username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             source scripts/set_env.sh
