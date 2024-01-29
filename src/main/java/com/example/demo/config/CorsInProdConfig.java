@@ -34,7 +34,7 @@ public class CorsInProdConfig {
     @Bean
     public Customizer<CorsConfigurer<HttpSecurity>> corsConfigurationSourceForTest() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://main-project-team-4-frontend.vercel.app", "https://www.re-use.store", "http://localhost:5173", "http://localhost:3000", "http://52.79.110.195"));
+        configuration.setAllowedOrigins(Arrays.asList("https://main-project-team-4-frontend.vercel.app", "https://www.re-use.store", "http://localhost:5173", "http://localhost:3000", corsAllowedOrigin));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Cache-Control", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Authorization_Refresh"));
