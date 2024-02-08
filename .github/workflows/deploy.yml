@@ -57,6 +57,18 @@ jobs:
             source scripts/set_env.sh
             source scripts/run_new_process.sh
 
+      # Slack Notification
+      - name: action-slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          author_name: Re-Use Backend
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          if_mention: failure,cancelled
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.
+
 #      - name: Deploy Jar
 #        uses: appleboy/scp-action@v0.1.4
 #        with:
