@@ -55,7 +55,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             source scripts/set_env.sh
-            source scripts/run_new_process.sh
+            source scripts/update_process.sh
 
       # Slack Notification
       - name: action-slack
