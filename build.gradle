@@ -96,6 +96,9 @@ dependencies {
 	// 역직렬화 오류
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	// slack
+	implementation "com.slack.api:slack-api-client:1.25.1"
 }
 
 tasks.named('test') {
