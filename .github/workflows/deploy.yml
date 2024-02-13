@@ -36,28 +36,30 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean bootJar
 
-      # 도커 이미지 태그 확인
-      - name: Fetch the latest tag from Docker Hub
+      # 도커 이미지 태그 확인 및 지정
+      - name: Fetch the latest tag from Docker Hub and Determine New Tag
         run: |
           TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKER_ID }}", "password": "${{ secrets.DOCKER_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r '.token')
           echo "TOKEN=$TOKEN" >> $GITHUB_ENV
-          LATEST_TAG=$(curl -s -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPO }}/tags/ | jq -r '.results[0].name')
-          echo "Latest tag from Docker Hub is $LATEST_TAG"
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
-          echo "TOKEN=" >> $GITHUB_ENV
-
-      # 도커 이미지 태그 지정
-      - name: Determine New Tag
-        run: |
-          if [ "$LATEST_TAG" == "blue" ]; then
+          
+          LAST_UPDATED_BLUE=$(curl -s -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPO }}/tags/ | jq -r '.results[] | select(.name=="blue") | .last_updated')
+          LAST_UPDATED_GREEN=$(curl -s -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPO }}/tags/ | jq -r '.results[] | select(.name=="green") | .last_updated')
+          echo "LAST_UPDATED_BLUE=$LAST_UPDATED_BLUE" >> $GITHUB_ENV
+          echo "LAST_UPDATED_GREEN=$LAST_UPDATED_GREEN" >> $GITHUB_ENV
+          LAST_UPDATED_BLUE = datetime.strptime(LAST_UPDATED_BLUE, "%Y-%m-%dT%H:%M:%S.%fZ")
+          LAST_UPDATED_GREEN = datetime.strptime(LAST_UPDATED_GREEN, "%Y-%m-%dT%H:%M:%S.%fZ")
+          echo "LAST_UPDATED_BLUE=$LAST_UPDATED_BLUE" >> $GITHUB_ENV
+          echo "LAST_UPDATED_GREEN=$LAST_UPDATED_GREEN" >> $GITHUB_ENV
+          
+          if [ "$LAST_UPDATED_BLUE" > "$LAST_UPDATED_GREEN" ]; then
             NEW_TAG="green"
-          elif [ "$LATEST_TAG" == "green" ]; then
-            NEW_TAG="blue"
           else
             NEW_TAG="blue"
           fi
+          
           echo "New tag will be $NEW_TAG"
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          echo "TOKEN=" >> $GITHUB_ENV
 
       # 도커 빌드 & 이미지 push
       - name: Docker build & Push
