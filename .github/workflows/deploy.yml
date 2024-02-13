@@ -46,12 +46,12 @@ jobs:
           LAST_UPDATED_GREEN=$(curl -s -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPO }}/tags/ | jq -r '.results[] | select(.name=="green") | .last_updated')
           echo "LAST_UPDATED_BLUE=$LAST_UPDATED_BLUE" >> $GITHUB_ENV
           echo "LAST_UPDATED_GREEN=$LAST_UPDATED_GREEN" >> $GITHUB_ENV
-          LAST_UPDATED_BLUE = datetime.strptime(LAST_UPDATED_BLUE, "%Y-%m-%dT%H:%M:%S.%fZ")
-          LAST_UPDATED_GREEN = datetime.strptime(LAST_UPDATED_GREEN, "%Y-%m-%dT%H:%M:%S.%fZ")
+          LAST_UPDATED_BLUE=$(date -d "$LAST_UPDATED_BLUE" +%s)
+          LAST_UPDATED_GREEN=$(date -d "$LAST_UPDATED_GREEN" +%s)
           echo "LAST_UPDATED_BLUE=$LAST_UPDATED_BLUE" >> $GITHUB_ENV
           echo "LAST_UPDATED_GREEN=$LAST_UPDATED_GREEN" >> $GITHUB_ENV
           
-          if [ "$LAST_UPDATED_BLUE" > "$LAST_UPDATED_GREEN" ]; then
+          if [ "$LAST_UPDATED_BLUE" -gt "$LAST_UPDATED_GREEN" ]; then
             NEW_TAG="green"
           else
             NEW_TAG="blue"
