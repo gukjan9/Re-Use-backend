@@ -6,11 +6,6 @@ on:
     tags:
       - '#*'
 
-env:
-  TOKEN: null
-  LATEST_TAH: null
-  NEW_TAG: null
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -41,6 +36,12 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean bootJar
 
+      - name: Declare variable
+        run: |
+          echo "TOKEN=null" >> $GITHUB_ENV
+          echo "LATEST_TAG=null" >> $GITHUB_ENV
+          echo "NEW_TAG=null" >> $GITHUB_ENV
+
       # 도커 이미지 태그 확인
       - name: Fetch the latest tag from Docker Hub
         id: fetch_latest_tag
@@ -48,7 +49,7 @@ jobs:
           TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKER_ID }}", "password": "${{ secrets.DOCKER_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r '.results[0].token')
           LATEST_TAG=$(curl -s -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPO }}/tags/ | jq -r '.results[0].name')
           echo "Latest tag from Docker Hub is $LATEST_TAG"
-          echo "::set-output name=LATEST_TAG::$LATEST_TAG"
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
       # 도커 이미지 태그 지정
       - name: Determine New Tag
@@ -62,7 +63,7 @@ jobs:
             NEW_TAG="blue"
           fi
           echo "New tag will be $NEW_TAG"
-          echo "::set-output name=TAG::$NEW_TAG"
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
 
       # 도커 빌드 & 이미지 push
       - name: Docker build & Push
