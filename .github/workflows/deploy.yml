@@ -38,6 +38,7 @@ jobs:
 
       - name: Declare variable
         run: |
+          echo "TOKEN=null" >> $GITHUB_ENV
           echo "LATEST_TAG=null" >> $GITHUB_ENV
           echo "NEW_TAG=null" >> $GITHUB_ENV
 
