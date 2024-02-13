@@ -5,6 +5,12 @@ on:
 #      - main
     tags:
       - '#*'
+
+env:
+  TOKEN: null
+  LATEST_TAH: null
+  NEW_TAG: null
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
