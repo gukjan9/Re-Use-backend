@@ -38,7 +38,6 @@ jobs:
 
       - name: Declare variable
         run: |
-          echo "TOKEN=null" >> $GITHUB_ENV
           echo "LATEST_TAG=null" >> $GITHUB_ENV
           echo "NEW_TAG=null" >> $GITHUB_ENV
 
@@ -46,7 +45,7 @@ jobs:
       - name: Fetch the latest tag from Docker Hub
         id: fetch_latest_tag
         run: |
-          TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKER_ID }}", "password": "${{ secrets.DOCKER_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r '.results[0].token')
+          TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKER_ID }}", "password": "${{ secrets.DOCKER_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r '.token')
           LATEST_TAG=$(curl -s -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPO }}/tags/ | jq -r '.results[0].name')
           echo "Latest tag from Docker Hub is $LATEST_TAG"
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
@@ -57,7 +56,7 @@ jobs:
         run: |
           if [ "${{ steps.fetch_latest_tag.outputs.LATEST_TAG }}" == "blue" ]; then
             NEW_TAG="green"
-          else if [ "${{ steps.fetch_latest_tag.outputs.LATEST_TAG }}" == "green" ]; then
+          elif [ "${{ steps.fetch_latest_tag.outputs.LATEST_TAG }}" == "green" ]; then
             NEW_TAG="blue"
           else
             NEW_TAG="blue"
