@@ -38,17 +38,16 @@ jobs:
 
       # 도커 이미지 태그 확인
       - name: Fetch the latest tag from Docker Hub
-        id: fetch_latest_tag
         run: |
           TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKER_ID }}", "password": "${{ secrets.DOCKER_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r '.token')
           echo "TOKEN=$TOKEN" >> $GITHUB_ENV
           LATEST_TAG=$(curl -s -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPO }}/tags/ | jq -r '.results[0].name')
           echo "Latest tag from Docker Hub is $LATEST_TAG"
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          echo "TOKEN=" >> $GITHUB_ENV
 
       # 도커 이미지 태그 지정
       - name: Determine New Tag
-        id: new_tag
         run: |
           if [ "$LATEST_TAG" == "blue" ]; then
             NEW_TAG="green"
