@@ -94,6 +94,9 @@ dependencies {
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 
+	// actuator
+	implementation('org.springframework.boot:spring-boot-starter-actuator')
+
 	// slack
 	implementation "com.slack.api:slack-api-client:1.25.1"
 }

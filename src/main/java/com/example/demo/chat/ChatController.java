@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @RequiredArgsConstructor
-public class HomeController {
+public class ChatController {
     private final ChatRoomService chatRoomService;
     @GetMapping("/chat/room")         // 접속 주소
     public String getChatRooms() {
