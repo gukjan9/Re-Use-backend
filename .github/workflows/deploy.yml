@@ -22,6 +22,14 @@ jobs:
           distribution: 'temurin'
 
       # CD
+      # 현재 실행 중인 프로세스 포트 확인
+      - name: Get port from /port
+        id: get-port
+        run: |
+          PORT=$(curl -s http://localhost:8080/port)
+          echo "Port is $PORT"
+          echo "::set-output name=port::$PORT"
+
       # 배포를 위한 prod properties 설정
       - name: Make application-prod.properties
         run: |
@@ -35,6 +43,18 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew clean bootJar
+
+      # 포트에 따라 이미지 태그 결정
+      - name: Determine image tag
+        id: determine-tag
+        run: |
+          if [ "${{ steps.get-port.outputs.port }}" == "8081" ]; then
+            echo "::set-output name=tag::blue"
+          elif [ "${{ steps.get-port.outputs.port }}" == "8082" ]; then
+            echo "::set-output name=tag::green"
+          else
+            echo "Unexpected port: ${{ steps.get-port.outputs.port }}"
+            exit 1
 
       # 도커 이미지 태그 확인 및 지정
       - name: Fetch the latest tag from Docker Hub and Determine New Tag
